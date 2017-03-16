@@ -12,16 +12,17 @@ var mongoose = require('mongoose');
 
 
 // *** routes *** //
-var routes = require('./routes/index.js');
+var routes = require('./routes/index');
+var scheduleData = require('./grabData/scheduleData');
+var dashboard = require('./routes/dashboard');
 
+mongoose.Promise = global.Promise;
 
 // *** express instance *** //
 var app = express();
 
-
 // *** mongoose *** //
-mongoose.connect('mongodb://localhost/passport-social-auth');
-
+mongoose.connect('mongodb://localhost/codernews');
 
 // *** view engine *** //
 var swig = new swig.Swig();
@@ -40,7 +41,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../client/public')));
 app.use(session({
-  secret: 'keyboard cat',
+  secret: 'shhhhhh',
   resave: true,
   saveUninitialized: true
 }));
@@ -50,6 +51,8 @@ app.use(passport.session());
 
 // *** main routes *** //
 app.use('/', routes);
+
+app.use('/dashboard', isLoggedIn, dashboard);
 
 
 // catch 404 and forward to error handler
@@ -84,5 +87,16 @@ app.use(function(err, req, res, next) {
   });
 });
 
-
 module.exports = app;
+
+(function() {
+  scheduleData.init();
+})();
+
+
+function isLoggedIn(req, res, next) {
+  console.log("middleware hit")
+  if (req.isAuthenticated())
+      return next();
+  res.redirect('/');
+}
