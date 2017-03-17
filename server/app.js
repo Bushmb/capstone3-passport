@@ -52,7 +52,8 @@ app.use(passport.session());
 // *** main routes *** //
 app.use('/', routes);
 
-app.use('/dashboard', isLoggedIn, dashboard);
+// app.use('/dashboard', isLoggedIn, dashboard);
+app.use('/dashboard', dashboard);
 
 
 // catch 404 and forward to error handler
