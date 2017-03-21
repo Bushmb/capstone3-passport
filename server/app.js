@@ -10,13 +10,15 @@ var passport = require('passport');
 var session = require('express-session');
 var mongoose = require('mongoose');
 
-
 // *** routes *** //
 var routes = require('./routes/index');
 var scheduleData = require('./grabData/scheduleData');
 var dashboard = require('./routes/dashboard');
+var hacker = require('./routes/hacker');
 
 mongoose.Promise = global.Promise;
+
+//test //
 
 // *** express instance *** //
 var app = express();
@@ -39,21 +41,23 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+
 app.use(express.static(path.join(__dirname, '../client/public')));
 app.use(session({
   secret: 'shhhhhh',
   resave: true,
   saveUninitialized: true
 }));
+
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 // *** main routes *** //
 app.use('/', routes);
-
-// app.use('/dashboard', isLoggedIn, dashboard);
-app.use('/dashboard', dashboard);
+app.use('/dashboard', isLoggedIn, dashboard);
+app.use('/hacker', hacker);
 
 
 // catch 404 and forward to error handler

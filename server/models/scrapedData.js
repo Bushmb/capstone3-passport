@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 // create User Schema
 var scrapedData = new Schema({
-	story_id: String,
+	  story_id: { type: String, unique: true },
    	orig_url: String,
   	topic: String,
   	date: String,

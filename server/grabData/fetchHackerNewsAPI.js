@@ -13,10 +13,10 @@ function fetchHackerNewsAPI() {
 	scrapedData.remove({}, function(err,removed) {
 	});
 
-	const topics = ['javascript'];
+	const topics = ['javascript', 'redux'];
 
 	topics.forEach(function(topic){
-		const url = `http://hn.algolia.com/api/v1/search_by_date?query=${topic}&hitsPerPage=10&tags=story`
+		const url = `http://hn.algolia.com/api/v1/search_by_date?query=${topic}&hitsPerPage=100&tags=story`
 		const results = [];
 		request(url, function(error, response, body) {
 			const data = JSON.parse(body);
@@ -58,78 +58,88 @@ function fetchHTML(results) {
 				console.log("error", error);
 			}
 			// Pull out content from each link
-			const unfluffed = unfluff(body)
+			let unfluffed;
+			try {
+				unfluffed = unfluff(body)
+			}
+			catch(e) {
+				console.log(e)
+			}
+			
+			if(unfluffed) {
 
-			// Grabbing the original URL for a poss linkback
-			const orig_url = result.pageUrl;
+				// Grabbing the original URL for a poss linkback
+				const orig_url = result.pageUrl;
 
-			// What topic was being searched
-			const topic = result.topic;
-		
-			// Current Points on Hacker News
-			const points = result.points;
-		
-			// Grab the date the article was posted on HackerNews
-			const date = dateFormat(result.date);
-		
-			// Grab story title if it has one.
-			let title = unfluffed.title;
-			title = (title && title !== "400 Bad Request") ? title : false;
-			title = title ? title : result.hn_title;
-		
-			// Grab story description if there is one
-			const desc = unfluffed.description;
-		
-			// Grab image
-			const img = unfluffed.image;
-		
-			// Create unique story id from stripped and shortened url
-			const story_id = result.pageUrl.replace(/[^a-z0-9]+/ig, "").substring(5, 40);
-			console.log("ID", story_id);
+				// What topic was being searched
+				const topic = result.topic;
+			
+				// Current Points on Hacker News
+				const points = result.points;
+			
+				// Grab the date the article was posted on HackerNews
+				const date = dateFormat(result.date);
+			
+				// Grab story title if it has one.
+				let title = unfluffed.title;
+				title = (title && title !== "400 Bad Request") ? title : false;
+				title = title ? title : result.hn_title;
+			
+				// Grab story description if there is one
+				const desc = unfluffed.description;
+			
+				// Grab image
+				const img = unfluffed.image ? unfluffed.image : "https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97180&w=256&h=180";
+			
+				// Create unique story id from stripped and shortened url
+				const story_id = result.pageUrl.replace(/[^a-z0-9]+/ig, "").substring(5, 40);
 
-			// Clean up the url for front end design
-			const display_url = result.pageUrl.split('/')[2].replace(/www./i, '')
-	
-			// Get a word count of the story's description
-		   	const desc_words = desc ? desc.split(' ').length : false
-		   
-		   	// Make sure the description is long enough for front end design
-		   	const desc_check = desc_words > 7 ? desc_words : false
-		   
-		   	// Grab first 200 chars of text from article
-		   	const text = unfluffed.text
-		   			   ? unfluffed.text.substring(0, 200).replace(/\n\n/g, ' ') 
-		   			   : false
+				// Clean up the url for front end design
+				const display_url = result.pageUrl.split('/')[2].replace(/www./i, '')
+		
+				// Get a word count of the story's description
+			   	const desc_words = desc ? desc.split(' ').length : false
+			   
+			   	// Make sure the description is long enough for front end design
+			   	const desc_check = desc_words > 7 ? desc_words : false
+			   
+			   	// Grab first 200 chars of text from article
+			   	const text = unfluffed.text
+			   			   ? unfluffed.text.substring(0, 200).replace(/\n\n/g, ' ') 
+			   			   : false
 
-		   	// Word Length of text from sraped page
-		   	const text_words = unfluffed.text ? unfluffed.text.split(' ').length: false;
-		   
-		   	// How long will it take a user to read this story?
-	   	    const mins = Math.ceil(unfluffed.text.split(' ').length / 250)
+			   	// Word Length of text from sraped page
+			   	const text_words = unfluffed.text ? unfluffed.text.split(' ').length: false;
+			   
+			   	// How long will it take a user to read this story?
+		   	    const mins = Math.ceil(unfluffed.text.split(' ').length / 250)
 
-	   	    // Make sure the story is long enough to be worth reading
-	   	    const mins_check = mins > 1 ? mins + " Min Read" : false
-	   	   
-	   	    const story = {
-	   	    	story_id, orig_url, topic, date, title, desc, img,
-	   	    	display_url, text, mins_check, points, text_words
-	   	    }
+		   	    // Make sure the story is long enough to be worth reading
+		   	    const mins_check = mins > 1 ? mins + " Min Read" : false
+		   	   
+		   	    const story = {
+		   	    	story_id, orig_url, topic, date, title, desc, img,
+		   	    	display_url, text, mins_check, points, text_words
+		   	    }
 
-	   	    if(Object.keys(story).every(key => story[key])) {
-   	    	    
-	   	    	scrapedData.count({story_id: story.story_id}, function (err, count){ 
-	   	    	    if(count>0){	
-	   	    	    	console.log("+++++++ Already in DB +++++++");
-	   	    	    	
-	   	    	    } else {
-	    	    		scrapedData.create(story, function (err, story) {
-	    	    		if (err) return handleError(err);
-	    	    		console.log("+++NOT IN DB++++SAVING NOW++++");
-	    	    	    })
-	   	    	    }
-	   	    	}); 
-	   	    		
-	   	    }
+		   	    if(Object.keys(story).every(key => story[key])) {
+	   	    	    // console.log("STORY_ID!!!!!", story.story_id);
+		   	    	scrapedData.count({story_id: story.story_id}, function (err, count){ 
+		   	    		
+		   	    	    	
+		   	    	    	// console.log("+++++++ Already in DB +++++++");
+		   	    	    if(!count) {
+		    	    		scrapedData.create(story, function (err, savedStory) {
+			    	    		// console.log("STORY_ID!!!!!", story.story_id);
+			    	    		console.log("Count", count, story.story_id)
+			    	    		if (err) console.log (err);
+		    	    			// console.log("+++NOT IN DB++++SAVING NOW++++");
+		    	    	    })
+		   	    	    }
+		   	    	}); 
+		   	    		
+		   	    }
+	   		}
 		
 		});
 	});
