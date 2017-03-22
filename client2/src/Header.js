@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Collapse, Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, NavLink } from 'reactstrap';
+import './App.css';
 
 class Header extends Component {
   constructor(props) {
@@ -18,14 +19,11 @@ class Header extends Component {
   render() {
     return (
       <div>
-        <Navbar color="faded" light toggleable>
+        <Navbar className="App-header" color="faded" inverse fixed="top" toggleable>
           <NavbarToggler right onClick={this.toggle} />
           <NavbarBrand href="/">Coder News</NavbarBrand>
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
-              <NavItem>
-                <NavLink href="/components">######</NavLink>
-              </NavItem>
               <NavItem>
                 <NavLink href="/logout">Log Out</NavLink>
               </NavItem>
