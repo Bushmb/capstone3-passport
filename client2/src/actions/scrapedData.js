@@ -10,7 +10,7 @@ export function scrapedDataIsLoading(bool) {
         isLoading: bool
     };
 }
-export function scrapedDataFetchDataSuccess(items) {
+export function scrapedDataFetchDataSuccess(scrapedData) {
     return {
         type: 'SCRAPEDDATA_FETCH_DATA_SUCCESS',
         scrapedData
@@ -33,3 +33,4 @@ export function scrapedDataFetchData(url) {
             .catch(() => dispatch(scrapedDataHasErrored(true)));
     };
 }
+
