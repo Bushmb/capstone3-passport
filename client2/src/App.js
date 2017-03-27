@@ -10,9 +10,9 @@ import ContentContainer from './ContentContainer';
 class App extends Component {
   render() {
     return (
-      <div style={{ backgroundColor: '#6B6B6B'}}>
+      <div className="content-container">
         <Header />
-        <h1 style={{ backgroundColor: '#6B6B6B'}} className="App dark-theme">Coder News</h1>
+        <h1 className="content-container">Coder News</h1>
         <ContentContainer />
       </div>
     );

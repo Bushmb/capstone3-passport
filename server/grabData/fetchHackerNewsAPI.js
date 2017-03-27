@@ -4,19 +4,20 @@ var unfluff = require('unfluff');
 
 const scrapedData = require('../models/scrapedData');
 
+
 ///////////////////////////////////////////////////////////////
 // Grab data from HackerNews API
 ///////////////////////////////////////////////////////////////
 
 function fetchHackerNewsAPI() {
 
-	scrapedData.remove({}, function(err,removed) {
-	});
+	// scrapedData.remove({}, function(err,removed) {
+	// });
 
-	const topics = ['javascript', 'redux'];
+	const topics = ['javascript', 'redux+react', 'perl', 'python', 'ruby', 'angular'];
 
 	topics.forEach(function(topic){
-		const url = `http://hn.algolia.com/api/v1/search_by_date?query=${topic}&hitsPerPage=100&tags=story`
+		const url = `http://hn.algolia.com/api/v1/search_by_date?query=${topic}&hitsPerPage=50&tags=story`
 		const results = [];
 		request(url, function(error, response, body) {
 			const data = JSON.parse(body);
@@ -54,9 +55,31 @@ function fetchHTML(results) {
 
 		// Call to each URL pulled from HackerNews
 		request(result.pageUrl, function (error, res, body) {
+			let isBlocked = "No";
 			if(error) {
 				console.log("error", error);
 			}
+			// If the page was found...
+			else if (!error && res.statusCode == 200) {
+
+			    // Grab the headers
+			    var headers = res.headers;
+
+			    // Grab the x-frame-options header if it exists
+			    var xFrameOptions = headers['x-frame-options'] || '';
+
+			    // Normalize the header to lowercase
+			    xFrameOptions = xFrameOptions.toLowerCase();
+
+			    // Check if it's set to a blocking option
+			    if (
+			      xFrameOptions === 'sameorigin' ||
+			      xFrameOptions === 'deny'
+			    ) {
+			      isBlocked = "Yes";
+			    }
+			}
+
 			// Pull out content from each link
 			let unfluffed;
 			try {
@@ -67,7 +90,6 @@ function fetchHTML(results) {
 			}
 			
 			if(unfluffed) {
-
 				// Grabbing the original URL for a poss linkback
 				const orig_url = result.pageUrl;
 
@@ -89,7 +111,13 @@ function fetchHTML(results) {
 				const desc = unfluffed.description;
 			
 				// Grab image
-				const img = unfluffed.image ? unfluffed.image : "https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97180&w=256&h=180";
+				let img = unfluffed.image ? unfluffed.image : "noimage"
+
+				if (img == "http://www.syntaxsuccess.com/img/bio.jpg") {
+					img = "noimage";
+				}
+				console.log("IMAGE TAG!", img)
+				// "https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97180&w=256&h=180";
 			
 				// Create unique story id from stripped and shortened url
 				const story_id = result.pageUrl.replace(/[^a-z0-9]+/ig, "").substring(5, 40);
@@ -119,32 +147,34 @@ function fetchHTML(results) {
 		   	   
 		   	    const story = {
 		   	    	story_id, orig_url, topic, date, title, desc, img,
-		   	    	display_url, text, mins_check, points, text_words
+		   	    	display_url, text, mins_check, points, text_words, isBlocked
 		   	    }
+		   	    if(isBlocked === "No") {
 
-		   	    if(Object.keys(story).every(key => story[key])) {
-	   	    	    // console.log("STORY_ID!!!!!", story.story_id);
-		   	    	scrapedData.count({story_id: story.story_id}, function (err, count){ 
-		   	    		
-		   	    	    	
-		   	    	    	// console.log("+++++++ Already in DB +++++++");
-		   	    	    if(!count) {
-		    	    		scrapedData.create(story, function (err, savedStory) {
-			    	    		// console.log("STORY_ID!!!!!", story.story_id);
-			    	    		console.log("Count", count, story.story_id)
-			    	    		if (err) console.log (err);
-		    	    			// console.log("+++NOT IN DB++++SAVING NOW++++");
-		    	    	    })
-		   	    	    }
-		   	    	}); 
-		   	    		
-		   	    }
+			   	    if(Object.keys(story).every(key => story[key])) {
+		   	    	    console.log("STORY_ID!!!!!", story.story_id);
+			   	    	scrapedData.count({story_id: story.story_id}, function (err, count){ 
+			   	    	
+			   	    	    if(!count) {
+			    	    		scrapedData.create(story, function (err, savedStory) {
+				    	    		// console.log("STORY_ID!!!!!", story.story_id);
+				    	    		// console.log("Count", count, story.story_id)
+				    	    		if (err) {
+				    	    			// console.log(err);
+				    	    		}
+			    	    			// console.log("+++NOT IN DB++++SAVING NOW++++");
+			    	    	    })
+			   	    	    }
+			   	    	}); 
+			   	    		
+			   	    }
+		   		}
 	   		}
 		
 		});
 	});
 	scrapedData.count({}, function(err, count){
-	    console.log( "TOTAL Number of docs: ", count );
+	    // console.log( "TOTAL Number of docs: ", count );
 	});
 };
 

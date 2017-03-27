@@ -18,10 +18,10 @@ class ButtonList extends Component {
 		// this.setState({ selectedTopic: e.target.value })
 		
 	}
-
+    
 	render() {
 		return(
-			<div className="button-list">
+			<div className="button-list content-container" data-spy="affix" data-offset-top="195">
 		       <Button color={this.props.selectedTopic === "javascript" ? "primary" : "info"} value="javascript" onClick={this.handleClick}>Javascript</Button>{' '}
 		       <Button color={this.props.selectedTopic === "redux+react" ? "primary" : "info"} value="redux+react" onClick={this.handleClick}>React/Redux</Button>{' '}
 		       <Button color={this.props.selectedTopic === "perl" ? "primary" : "info"} value="perl" onClick={this.handleClick}>Perl</Button>{' '}

@@ -14,7 +14,8 @@ var scrapedData = new Schema({
   	text: String,
   	mins_check: String,
   	points: Number,
-  	text_words: Number
+  	text_words: Number,
+    isBlocked: String
 });
 
 

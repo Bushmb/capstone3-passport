@@ -20,16 +20,27 @@ const scheduleData = {
 	scheduleJob: function() {
 		// this rule is standard cron syntax for 
 		// once every minute.
-		rule = '';
+		// rule = '';
 
 		// once every 15 mintues.
-		// rule = '15 * * * *';
+		rule = '*/15 * * * *';
 		// mongoDB.remove({}, console.log("DB is clean"));
+
+		scrapedData.remove({}, function(err,removed) {
+		console.log("Clearing DB");
+		});
 		
 		fetchHackerNewsAPI();
+		
 
 		const job = schedule.scheduleJob(rule, function() {
+
+			// wiping database to only show latest articles
+			
+
 			//this is where the request call should be made to populate the db
+			// fetchHackerNewsAPI();
+			
 		});
 	},
 

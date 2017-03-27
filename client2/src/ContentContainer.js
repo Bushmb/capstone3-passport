@@ -18,8 +18,8 @@ class ContentContainer extends Component {
   }
   render() {
     return (
-      <div style={{ backgroundColor: '#6B6B6B'}}>
-        <ButtonList />
+      <div className="content-container">
+          <ButtonList />
         <CardContainer />
       </div>
     );

@@ -5,7 +5,6 @@ var passportTwitter = require('../auth/twitter');
 
 
 router.get('/', function(req, res, next) {
-  console.log('hello')
   res.render('index', { title: 'Express' });
 });
 
