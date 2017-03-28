@@ -6,7 +6,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 // import './theme.min.css';
 import './index.css';
 import './App.css';
-import App from './App';
+// import App from './App';
+import Login from './Login';
 
 const store = configureStore(); 
 
@@ -14,7 +15,7 @@ const store = configureStore();
 
 ReactDOM.render(
 	<Provider store={store}>
-  		<App />
+  		<Login />
   	</Provider>,
   	document.getElementById('root')
 );

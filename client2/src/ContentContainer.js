@@ -6,8 +6,6 @@ import CardContainer from './CardContainer';
 import { connect } from 'react-redux';
 import { scrapedDataFetchData } from './actions/scrapedData';
 
-
-
 // function to pass to buttons which was clicked
 // pass down our stories to the card container
 
@@ -19,7 +17,7 @@ class ContentContainer extends Component {
   render() {
     return (
       <div className="content-container">
-          <ButtonList />
+        <ButtonList />
         <CardContainer />
       </div>
     );

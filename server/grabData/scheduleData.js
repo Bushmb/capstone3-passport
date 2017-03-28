@@ -26,11 +26,11 @@ const scheduleData = {
 		rule = '*/15 * * * *';
 		// mongoDB.remove({}, console.log("DB is clean"));
 
-		scrapedData.remove({}, function(err,removed) {
-		console.log("Clearing DB");
-		});
+		// scrapedData.remove({}, function(err,removed) {
+		// console.log("Clearing DB");
+		// });
 		
-		fetchHackerNewsAPI();
+		// fetchHackerNewsAPI();
 		
 
 		const job = schedule.scheduleJob(rule, function() {
